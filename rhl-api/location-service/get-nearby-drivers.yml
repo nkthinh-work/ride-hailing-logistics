@@ -1,0 +1,28 @@
+info:
+  name: get-nearby-drivers
+  type: http
+  seq: 5
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/v1/locations/nearby?longitude=105.8342&latitude=21.0278&radiusKm=3&limit=10"
+  auth:
+    type: bearer
+    token: "{{adminToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Response is an array of nearby drivers", function() {
+          expect(res.body).to.be.an("array");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

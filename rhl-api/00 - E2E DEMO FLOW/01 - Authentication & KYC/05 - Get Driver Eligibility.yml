@@ -1,0 +1,30 @@
+info:
+  name: 05 - Get Driver Eligibility
+  type: http
+  seq: 5
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/v1/drivers/applications/me/eligibility"
+  auth:
+    type: bearer
+    token: "{{driverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Driver eligibility checks succeed", function() {
+          expect(res.body).to.have.property("eligible");
+          expect(res.body.applicationStatus).to.equal("APPROVED");
+          expect(res.body.hasDriverRole).to.equal(true);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

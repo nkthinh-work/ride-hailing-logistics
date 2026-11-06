@@ -1,0 +1,29 @@
+info:
+  name: driver-turn-offline
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/locations/me/offline"
+  auth:
+    type: bearer
+    token: "{{driverToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Driver status is updated to OFFLINE", function() {
+          expect(res.body).to.have.property("status");
+          expect(res.body.status).to.equal("OFFLINE");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

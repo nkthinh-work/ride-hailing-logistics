@@ -1,0 +1,38 @@
+info:
+  name: cancel-trip-idempotent-repeat
+  type: http
+  seq: 9
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/trips/{{tripId}}/cancel"
+  headers:
+    - name: Content-Type
+      value: application/json
+  auth:
+    type: bearer
+    token: "{{customerAccessToken}}"
+  body:
+    type: json
+    data: |-
+      {
+        "reasonCode": "CUSTOMER_CHANGE_OF_MIND",
+        "description": "Repeated cancel call"
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK for idempotent repeat", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Returns already cancelled trip", function() {
+          expect(res.body.status).to.equal("CANCELLED");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

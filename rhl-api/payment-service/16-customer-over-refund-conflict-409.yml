@@ -1,0 +1,41 @@
+info:
+  name: 16-customer-over-refund-conflict-409
+  type: http
+  seq: 16
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/payments/{{paymentId}}/refunds"
+  headers:
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: "idemp-refund-over-002"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+  body:
+    type: json
+    data: |-
+      {
+        "amount": 999999999,
+        "reason": "Requesting amount larger than total trip fare"
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 409 Conflict", function() {
+          expect(res.status).to.equal(409);
+        });
+        test("Error indicates OVER_REFUND_ERROR with remaining refundable amount", function() {
+          expect(res.body.error).to.equal("OVER_REFUND_ERROR");
+          expect(res.body).to.have.property("remainingRefundableAmount");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,31 @@
+info:
+  name: cancel-trip-unauthenticated-401
+  type: http
+  seq: 10
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/trips/{{tripId}}/cancel"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "reasonCode": "CANCEL"
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 401 Unauthorized", function() {
+          expect(res.status).to.equal(401);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

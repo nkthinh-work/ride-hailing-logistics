@@ -1,0 +1,39 @@
+info:
+  name: create-trip-idempotency-conflict
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/trips"
+  headers:
+    - name: Content-Type
+      value: application/json
+  auth:
+    type: bearer
+    token: "{{customerAccessToken}}"
+  body:
+    type: json
+    data: |-
+      {
+        "quoteId": "00000000-0000-0000-0000-000000000001",
+        "idempotencyKey": "{{tripIdempotencyKey}}",
+        "serviceType": "RIDE",
+        "vehicleType": "CAR_4_SEAT",
+        "customerConfirmedSurge": true
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 409 Conflict for different payload with same key", function() {
+          expect(res.status).to.equal(409);
+          expect(res.body.code).to.equal("IDEMPOTENCY_CONFLICT");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

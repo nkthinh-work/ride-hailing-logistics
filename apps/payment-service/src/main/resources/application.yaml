@@ -1,0 +1,66 @@
+server:
+  port: 8087
+  error:
+    include-stacktrace: never
+    include-exception: false
+    include-message: never
+
+spring:
+  application:
+    name: payment-service
+
+  datasource:
+    url: ${PAYMENT_DATABASE_URL:jdbc:postgresql://localhost:5436/rhl_payment}
+    username: ${DB_USER:rhl}
+    password: ${DB_PASSWORD:local}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+security:
+  jwt:
+    issuer: rhl-identity
+    public-key-location: classpath:keys/public.pem
+  internal:
+    secret: ${INTERNAL_SERVICE_SECRET:rhl-internal-secret-2026}
+
+trip:
+  service:
+    base-url: ${TRIP_SERVICE_BASE_URL:http://localhost:8084}
+    internal-secret: ${TRIP_INTERNAL_SECRET:rhl-internal-secret-2026}
+    connect-timeout-ms: ${TRIP_CONNECT_TIMEOUT_MS:2000}
+    read-timeout-ms: ${TRIP_READ_TIMEOUT_MS:3000}
+
+payment:
+  provider: ${PAYMENT_PROVIDER:momo}
+  momo:
+    partner-code: ${MOMO_PARTNER_CODE:MOMO_TEST_PARTNER}
+    access-key: ${MOMO_ACCESS_KEY:MOMO_TEST_ACCESS_KEY}
+    secret-key: ${MOMO_SECRET_KEY:MOMO_TEST_SECRET_KEY}
+    endpoint: ${MOMO_ENDPOINT:https://test-payment.momo.vn}
+    ipn-url: ${MOMO_IPN_URL:http://localhost:8080/api/v1/payments/webhook/momo}
+    redirect-url: ${MOMO_REDIRECT_URL:http://localhost:3000/customer/payment-result}
+    connect-timeout-ms: 3000
+    read-timeout-ms: 5000
+  outbox:
+    enabled: ${PAYMENT_OUTBOX_ENABLED:true}
+    poll-interval-ms: ${PAYMENT_OUTBOX_POLL_INTERVAL_MS:1000}
+
+kafka:
+  enabled: ${KAFKA_ENABLED:true}
+  bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9094}
+  topics:
+    payment-events: ${KAFKA_PAYMENT_EVENTS_TOPIC:rhl.payment.events.v1}
+  producer:
+    acks: all
+    retries: 3
+    retry-backoff-ms: 1000
+    timeout-ms: 5000
+

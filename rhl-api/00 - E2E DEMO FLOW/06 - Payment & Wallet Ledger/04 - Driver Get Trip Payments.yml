@@ -1,0 +1,30 @@
+info:
+  name: 04 - Driver Get Trip Payments
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/v1/payments/driver/trips/{{tripId}}"
+  auth:
+    type: bearer
+    token: "{{driverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Driver can view trip payment list", function() {
+          expect(res.body).to.be.an("array");
+          expect(res.body.length).to.be.greaterThan(0);
+          expect(res.body[0].tripId).to.equal(bru.getEnvVar("tripId"));
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

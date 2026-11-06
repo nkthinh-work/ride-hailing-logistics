@@ -1,0 +1,30 @@
+info:
+  name: get-driver-eligibility-internal
+  type: http
+  seq: 12
+
+http:
+  method: GET
+  url: "{{identityBaseUrl}}/internal/v1/drivers/{{applicationId}}/eligibility"
+  headers:
+    - name: X-Internal-Secret
+      value: "{{internalSecret}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Eligibility response contains boolean eligible flag", function() {
+          expect(res.body).to.have.property("eligible");
+          expect(res.body).to.have.property("userId");
+          expect(res.body).to.have.property("reasons");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

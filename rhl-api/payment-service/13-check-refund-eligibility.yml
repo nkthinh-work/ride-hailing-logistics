@@ -1,0 +1,33 @@
+info:
+  name: 13-check-refund-eligibility
+  type: http
+  seq: 13
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/v1/payments/{{paymentId}}/refunds/eligibility"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Refund eligibility details returned", function() {
+          expect(res.body.paymentId).to.equal(bru.getEnvVar("paymentId"));
+          expect(res.body).to.have.property("eligible");
+          expect(res.body).to.have.property("originalAmount");
+          expect(res.body).to.have.property("alreadyRefundedAmount");
+          expect(res.body).to.have.property("remainingRefundableAmount");
+          expect(res.body.currency).to.equal("VND");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

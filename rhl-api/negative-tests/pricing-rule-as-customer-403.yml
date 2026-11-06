@@ -1,0 +1,47 @@
+info:
+  name: pricing-rule-as-customer-403
+  type: http
+  seq: 15
+
+http:
+  method: POST
+  url: "{{pricingBaseUrl}}/api/v1/admin/pricing-rules"
+  headers:
+    - name: Content-Type
+      value: application/json
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+  body:
+    type: json
+    data: |-
+      {
+        "serviceType": "RIDE",
+        "vehicleType": "MOTORBIKE",
+        "regionId": "DEFAULT",
+        "baseFare": 12000,
+        "includedDistanceKm": 2.0,
+        "pricePerKm": 4500,
+        "pricePerMinute": 400,
+        "minimumFare": 12000,
+        "currency": "VND",
+        "effectiveFrom": "2026-11-01T00:00:00Z"
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 403 Forbidden", function() {
+          expect(res.status).to.equal(403);
+        });
+        test("Error code indicates access denied", function() {
+          expect(res.body).to.have.property("code");
+          expect(["ACCESS_DENIED", "FORBIDDEN"]).to.include(res.body.code);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

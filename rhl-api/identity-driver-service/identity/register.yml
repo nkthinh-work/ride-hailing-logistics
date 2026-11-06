@@ -1,0 +1,38 @@
+info:
+  name: register
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/auth/register"
+  body:
+    type: json
+    data: |-
+      {
+        "email": "{{registerEmail}}",
+        "password": "Password123!"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: before-request
+      code: |-
+        const uniqueEmail = "user." + Date.now() + "@example.com";
+        bru.setVar("registerEmail", uniqueEmail);
+    - type: tests
+      code: |-
+        test("Status code is 201 Created", function() {
+          expect(res.status).to.equal(201);
+        });
+        test("Response contains id and email", function() {
+          expect(res.body).to.have.property("id");
+          expect(res.body).to.have.property("email");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

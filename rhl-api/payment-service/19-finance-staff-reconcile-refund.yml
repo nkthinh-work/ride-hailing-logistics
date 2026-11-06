@@ -1,0 +1,29 @@
+info:
+  name: 19-finance-staff-reconcile-refund
+  type: http
+  seq: 19
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/finance/refunds/{{refundId}}/reconcile"
+  auth:
+    type: bearer
+    token: "{{financeAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Refund queried and synchronized with provider state", function() {
+          expect(res.body.refundId).to.equal(bru.getEnvVar("refundId"));
+          expect(res.body).to.have.property("status");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,25 @@
+info:
+  name: 05-customer-tries-confirm-cash-403
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/payments/{{paymentId}}/cash/confirm"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 403 Forbidden (Customer cannot self-confirm cash)", function() {
+          expect(res.status).to.equal(403);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,46 @@
+info:
+  name: 12-momo-webhook-invalid-signature-400
+  type: http
+  seq: 12
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/payments/webhook/momo"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "partnerCode": "MOMO_TEST_PARTNER",
+        "orderId": "ORD-TAMPERED-001",
+        "requestId": "req-ipn-tampered",
+        "amount": 50000,
+        "orderInfo": "Payment for trip",
+        "orderType": "momo_wallet",
+        "transId": 987654321,
+        "resultCode": 0,
+        "message": "Successful.",
+        "payType": "qr",
+        "responseTime": 1680000000000,
+        "extraData": "",
+        "signature": "forged_tampered_invalid_signature_hex_code_12345"
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 400 Bad Request", function() {
+          expect(res.status).to.equal(400);
+        });
+        test("Error is PAYMENT_SECURITY_ERROR", function() {
+          expect(res.body.error).to.equal("PAYMENT_SECURITY_ERROR");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

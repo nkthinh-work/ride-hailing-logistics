@@ -1,0 +1,25 @@
+info:
+  name: 02 - Request With Invalid JWT (401)
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/v1/auth/me"
+  auth:
+    type: bearer
+    token: "invalid.jwt.token.signature"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 401 Unauthorized", function() {
+          expect(res.status).to.equal(401);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

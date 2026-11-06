@@ -1,0 +1,30 @@
+info:
+  name: driver-accept-repeat-idempotent
+  type: http
+  seq: 7
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/offers/{{offerId}}/accept"
+  headers: []
+  auth:
+    type: bearer
+    token: "{{driverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK (Idempotent replay)", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Returns existing ACCEPTED offer state", function() {
+          expect(res.body.id).to.equal(bru.getEnvVar("offerId"));
+          expect(res.body.status).to.equal("ACCEPTED");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

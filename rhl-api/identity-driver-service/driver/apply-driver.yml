@@ -1,0 +1,61 @@
+info:
+  name: apply-driver
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/drivers/applications"
+  body:
+    type: json
+    data: |-
+      {
+        "fullName": "Nguyen Van A",
+        "phone": "0912345678",
+        "driverLicenseNumber": "{{driverLicenseNumber}}",
+        "vehiclePlate": "{{vehiclePlate}}"
+      }
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+runtime:
+  scripts:
+    - type: before-request
+      code: |-
+        const ts = Date.now();
+        const email = `applicant.${ts}@example.com`;
+        const pwd = "Password123!";
+        const base = bru.getEnvVar("baseUrl") || "http://localhost:8080";
+        try {
+          await axios.post(`${base}/api/v1/auth/register`, { email: email, password: pwd });
+          const loginRes = await axios.post(`${base}/api/v1/auth/login`, { email: email, password: pwd });
+          if (loginRes.data && loginRes.data.accessToken) {
+            bru.setEnvVar("accessToken", loginRes.data.accessToken);
+          }
+        } catch (e) {
+          // fallback to existing accessToken if axios fails
+        }
+        const licTs = ts.toString().slice(-8);
+        bru.setEnvVar("driverLicenseNumber", "LIC" + licTs);
+        bru.setEnvVar("vehiclePlate", "30A-" + licTs.slice(-5));
+    - type: after-response
+      code: |-
+        if (res.status === 201 && res.body && res.body.id) {
+          bru.setEnvVar("applicationId", res.body.id);
+        }
+    - type: tests
+      code: |-
+        test("Status code is 201 Created", function() {
+          expect(res.status).to.equal(201);
+        });
+        test("Response contains application id and PENDING status", function() {
+          expect(res.body).to.have.property("id");
+          expect(res.body.status).to.equal("PENDING");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

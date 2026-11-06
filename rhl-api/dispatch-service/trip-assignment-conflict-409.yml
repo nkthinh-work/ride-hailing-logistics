@@ -1,0 +1,29 @@
+info:
+  name: trip-assignment-conflict-409
+  type: http
+  seq: 8
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/offers/{{competingOfferId}}/accept"
+  headers: []
+  auth:
+    type: bearer
+    token: "{{secondDriverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 409 Conflict", function() {
+          expect(res.status).to.equal(409);
+        });
+        test("Conflict code indicates winner already assigned", function() {
+          expect(res.body.code).to.be.oneOf(["ANOTHER_DRIVER_ALREADY_ACCEPTED", "TRIP_ALREADY_ACCEPTED", "DATABASE_CONSTRAINT_VIOLATION"]);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

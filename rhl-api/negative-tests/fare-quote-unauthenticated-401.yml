@@ -1,0 +1,36 @@
+info:
+  name: fare-quote-unauthenticated-401
+  type: http
+  seq: 17
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/fares/quote"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "serviceType": "RIDE",
+        "vehicleType": "MOTORBIKE",
+        "pickupLatitude": 10.7769,
+        "pickupLongitude": 106.7009,
+        "dropoffLatitude": 10.7725,
+        "dropoffLongitude": 106.6980
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 401 Unauthorized", function() {
+          expect(res.status).to.equal(401);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

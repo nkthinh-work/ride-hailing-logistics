@@ -1,0 +1,38 @@
+info:
+  name: archive-pricing-rule
+  type: http
+  seq: 5
+
+http:
+  method: PATCH
+  url: "{{pricingBaseUrl}}/api/v1/admin/pricing-rules/{{pricingRuleId}}/archive"
+  headers:
+    - name: Content-Type
+      value: application/json
+  auth:
+    type: bearer
+    token: "{{adminToken}}"
+  body:
+    type: json
+    data: |-
+      {
+        "reason": "Retiring rule due to seasonal rate change"
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Status is updated to ARCHIVED", function() {
+          expect(res.body.status).to.equal("ARCHIVED");
+          expect(res.body.effectiveTo).to.not.be.null;
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

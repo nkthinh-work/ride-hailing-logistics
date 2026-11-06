@@ -1,0 +1,38 @@
+info:
+  name: location-telemetry-stale-session-409
+  type: http
+  seq: 14
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/api/v1/locations/me"
+  body:
+    type: json
+    data: |-
+      {
+        "longitude": 105.8342,
+        "latitude": 21.0278,
+        "sequenceNumber": 50,
+        "sessionId": "00000000-0000-0000-0000-000000000001"
+      }
+  auth:
+    type: bearer
+    token: "{{driverToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 409 Conflict", function() {
+          expect(res.status).to.equal(409);
+        });
+        test("Error code indicates stale session packet", function() {
+          expect(res.body).to.have.property("code");
+          expect(res.body.code).to.equal("STALE_SESSION_PACKET");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,45 @@
+info:
+  name: 06 - Submit Driver Application (Skip if Approved)
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/drivers/applications"
+  body:
+    type: json
+    data: |-
+      {
+        "fullName": "Nguyen Van Lai",
+        "phone": "0987654321",
+        "driverLicenseNumber": "{{driverLicenseNumber}}",
+        "vehiclePlate": "{{vehiclePlate}}"
+      }
+  auth:
+    type: bearer
+    token: "{{customerAccessToken}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 201 && res.body && res.body.id) {
+          bru.setEnvVar("driverApplicationId", res.body.id);
+        }
+    - type: tests
+      code: |-
+        test("Status code is 201 Created or 409 Conflict if already applied", function() {
+          expect(res.status).to.be.oneOf([201, 409]);
+        });
+        if (res.status === 201) {
+          test("Returns application with PENDING status", function() {
+            expect(res.body).to.have.property("id");
+            expect(res.body.status).to.equal("PENDING");
+          });
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

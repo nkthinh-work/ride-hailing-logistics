@@ -1,0 +1,42 @@
+info:
+  name: 01 - Login Customer
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/auth/login"
+  body:
+    type: json
+    data: |-
+      {
+        "email": "customer.test@example.com",
+        "password": "Password123!"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 200 && res.body && res.body.accessToken) {
+          bru.setEnvVar("customerAccessToken", res.body.accessToken);
+          if (res.body.userId) {
+            bru.setEnvVar("customerUserId", res.body.userId);
+          }
+        }
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Customer access token received", function() {
+          expect(res.body).to.have.property("accessToken");
+          expect(res.body.tokenType).to.equal("Bearer");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

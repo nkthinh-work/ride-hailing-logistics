@@ -1,0 +1,23 @@
+info:
+  name: 01 - Request Without JWT (401)
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/v1/auth/me"
+  auth: none
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 401 Unauthorized", function() {
+          expect(res.status).to.equal(401);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

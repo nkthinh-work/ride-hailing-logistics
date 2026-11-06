@@ -1,0 +1,53 @@
+info:
+  name: create-pricing-rule
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{pricingBaseUrl}}/api/v1/admin/pricing-rules"
+  headers:
+    - name: Content-Type
+      value: application/json
+  auth:
+    type: bearer
+    token: "{{adminToken}}"
+  body:
+    type: json
+    data: |-
+      {
+        "serviceType": "RIDE",
+        "vehicleType": "MOTORBIKE",
+        "regionId": "DEFAULT",
+        "baseFare": 12000,
+        "includedDistanceKm": 2.0,
+        "pricePerKm": 4500,
+        "pricePerMinute": 400,
+        "minimumFare": 12000,
+        "currency": "VND",
+        "effectiveFrom": "2026-11-01T00:00:00Z",
+        "effectiveTo": null,
+        "reason": "Standard Motorbike Pricing Policy v1"
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 201 Created", function() {
+          expect(res.status).to.equal(201);
+        });
+        test("Returns versioned published rule", function() {
+          expect(res.body).to.have.property("id");
+          expect(res.body).to.have.property("version");
+          expect(res.body.status).to.equal("PUBLISHED");
+          expect(res.body.serviceType).to.equal("RIDE");
+          expect(res.body.vehicleType).to.equal("MOTORBIKE");
+          bru.setEnvVar("pricingRuleId", res.body.id);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

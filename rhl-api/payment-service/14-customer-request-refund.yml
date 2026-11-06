@@ -1,0 +1,46 @@
+info:
+  name: 14-customer-request-refund
+  type: http
+  seq: 14
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/payments/{{paymentId}}/refunds"
+  headers:
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: "idemp-refund-001"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+  body:
+    type: json
+    data: |-
+      {
+        "amount": 25000,
+        "reason": "Driver arrived late and cancelled trip"
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 201 Created", function() {
+          expect(res.status).to.equal(201);
+        });
+        test("Refund request created in REQUESTED state", function() {
+          expect(res.body.paymentId).to.equal(bru.getEnvVar("paymentId"));
+          expect(res.body.status).to.equal("REQUESTED");
+          expect(res.body.refundAmount).to.equal(25000);
+          expect(res.body.currency).to.equal("VND");
+          if (res.body.refundId) {
+            bru.setEnvVar("refundId", res.body.refundId);
+          }
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

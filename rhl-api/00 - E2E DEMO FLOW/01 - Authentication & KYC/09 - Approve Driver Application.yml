@@ -1,0 +1,30 @@
+info:
+  name: 09 - Approve Driver Application
+  type: http
+  seq: 9
+
+http:
+  method: PATCH
+  url: "{{baseUrl}}/api/v1/drivers/applications/{{driverApplicationId}}/approve"
+  auth:
+    type: bearer
+    token: "{{reviewerAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK or 409 if already approved", function() {
+          expect(res.status).to.be.oneOf([200, 409]);
+        });
+        if (res.status === 200) {
+          test("Application status transitions to APPROVED", function() {
+            expect(res.body.status).to.equal("APPROVED");
+          });
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

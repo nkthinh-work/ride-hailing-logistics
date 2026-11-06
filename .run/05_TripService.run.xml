@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="05_TripService" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.rhl.trip.TripServiceApplication" />
+    <module name="trip-service.main" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/apps/trip-service" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -1,0 +1,36 @@
+info:
+  name: 03 - Driver Get Pending Offer
+  type: http
+  seq: 3
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/v1/offers/pending"
+  auth:
+    type: bearer
+    token: "{{driverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 200 && res.body && res.body.offerId) {
+          bru.setEnvVar("offerId", res.body.offerId);
+        }
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Offer details match current trip and driver", function() {
+          expect(res.body).to.have.property("offerId");
+          expect(res.body.tripId).to.equal(bru.getEnvVar("tripId"));
+          expect(res.body.driverId).to.equal(bru.getEnvVar("driverUserId"));
+          expect(res.body.status).to.equal("PENDING");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

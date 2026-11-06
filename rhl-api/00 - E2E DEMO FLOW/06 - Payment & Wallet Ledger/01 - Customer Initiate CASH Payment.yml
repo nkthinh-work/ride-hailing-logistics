@@ -1,0 +1,46 @@
+info:
+  name: 01 - Customer Initiate CASH Payment
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/payments"
+  headers:
+    - name: Idempotency-Key
+      value: "{{paymentIdempotencyKey}}"
+  body:
+    type: json
+    data: |-
+      {
+        "tripId": "{{tripId}}",
+        "paymentMethod": "CASH"
+      }
+  auth:
+    type: bearer
+    token: "{{customerAccessToken}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 201 && res.body && res.body.paymentId) {
+          bru.setEnvVar("paymentId", res.body.paymentId);
+        }
+    - type: tests
+      code: |-
+        test("Status code is 201 Created", function() {
+          expect(res.status).to.equal(201);
+        });
+        test("Payment initialized with PENDING status for CASH collection", function() {
+          expect(res.body).to.have.property("paymentId");
+          expect(res.body.tripId).to.equal(bru.getEnvVar("tripId"));
+          expect(res.body.paymentMethod).to.equal("CASH");
+          expect(res.body.status).to.equal("PENDING");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

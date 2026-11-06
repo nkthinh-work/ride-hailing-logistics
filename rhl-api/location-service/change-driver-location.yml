@@ -1,0 +1,37 @@
+info:
+  name: change-driver-location
+  type: http
+  seq: 2
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/api/v1/locations/me"
+  body:
+    type: json
+    data: |-
+      {
+        "longitude": 105.8342,
+        "latitude": 21.0278
+      }
+  auth:
+    type: bearer
+    token: "{{driverToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Location response contains coordinates", function() {
+          expect(res.body).to.have.property("driverId");
+          expect(res.body.longitude).to.equal(105.8342);
+          expect(res.body.latitude).to.equal(21.0278);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

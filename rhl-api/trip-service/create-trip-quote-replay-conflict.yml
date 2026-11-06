@@ -1,0 +1,39 @@
+info:
+  name: create-trip-quote-replay-conflict
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/trips"
+  headers:
+    - name: Content-Type
+      value: application/json
+  auth:
+    type: bearer
+    token: "{{customerAccessToken}}"
+  body:
+    type: json
+    data: |-
+      {
+        "quoteId": "{{quoteId}}",
+        "idempotencyKey": "new-different-key-9999",
+        "serviceType": "RIDE",
+        "vehicleType": "MOTORBIKE",
+        "customerConfirmedSurge": true
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 409 Conflict for already used quote", function() {
+          expect(res.status).to.equal(409);
+          expect(res.body.code).to.equal("QUOTE_REPLAY_CONFLICT");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

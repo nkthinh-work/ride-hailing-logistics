@@ -1,0 +1,40 @@
+info:
+  name: 08-customer-initiate-conflicting-payload-409
+  type: http
+  seq: 8
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/payments"
+  headers:
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: "idemp-digital-momo-001"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+  body:
+    type: json
+    data: |-
+      {
+        "tripId": "{{paymentTripId}}",
+        "paymentMethod": "CASH"
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 409 Conflict", function() {
+          expect(res.status).to.equal(409);
+        });
+        test("Error code is IDEMPOTENCY_CONFLICT", function() {
+          expect(res.body.error).to.equal("IDEMPOTENCY_CONFLICT");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

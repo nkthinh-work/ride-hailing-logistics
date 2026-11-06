@@ -1,0 +1,30 @@
+info:
+  name: get-fare-quote
+  type: http
+  seq: 7
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/v1/fares/quotes/{{quoteId}}"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Returns quote matching requested quoteId", function() {
+          expect(res.body.quoteId).to.equal(bru.getEnvVar("quoteId"));
+          expect(res.body).to.have.property("customerId");
+          expect(res.body).to.have.property("totalFare");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

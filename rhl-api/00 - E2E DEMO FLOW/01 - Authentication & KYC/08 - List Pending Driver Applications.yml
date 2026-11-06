@@ -1,0 +1,33 @@
+info:
+  name: 08 - List Pending Driver Applications
+  type: http
+  seq: 8
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/v1/drivers/applications?status=PENDING"
+  auth:
+    type: bearer
+    token: "{{reviewerAccessToken}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 200 && Array.isArray(res.body) && res.body.length > 0) {
+          bru.setEnvVar("driverApplicationId", res.body[0].id);
+        }
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Applications list returned", function() {
+          expect(res.body).to.be.an("array");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

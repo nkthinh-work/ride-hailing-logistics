@@ -1,0 +1,35 @@
+info:
+  name: suspend-driver
+  type: http
+  seq: 9
+
+http:
+  method: PATCH
+  url: "{{baseUrl}}/api/v1/drivers/applications/{{applicationId}}/suspend"
+  body:
+    type: json
+    data: |-
+      {
+        "reason": "Temporary suspension due to investigation of policy breach"
+      }
+  auth:
+    type: bearer
+    token: "{{adminToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Application status is updated to SUSPENDED", function() {
+          expect(res.body).to.have.property("status");
+          expect(res.body.status).to.equal("SUSPENDED");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

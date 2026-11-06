@@ -1,0 +1,45 @@
+info:
+  name: 06-customer-initiate-digital-payment
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/payments"
+  headers:
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: "idemp-digital-momo-001"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+  body:
+    type: json
+    data: |-
+      {
+        "tripId": "{{paymentTripId}}",
+        "paymentMethod": "DIGITAL_WALLET"
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 or 201", function() {
+          expect([200, 201]).to.include(res.status);
+        });
+        test("Payment status is PROCESSING with checkoutUrl", function() {
+          expect(res.body.paymentMethod).to.equal("DIGITAL_WALLET");
+          expect(res.body.status).to.equal("PROCESSING");
+          expect(res.body.checkoutUrl).to.be.a("string");
+          if (res.body.paymentId) {
+            bru.setEnvVar("paymentId", res.body.paymentId);
+          }
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

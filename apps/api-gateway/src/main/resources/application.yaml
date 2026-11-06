@@ -1,0 +1,85 @@
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web.reactive: DEBUG
+security:
+  jwt:
+    issuer: rhl-identity
+    public-key-location: classpath:keys/public.pem
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: identity-auth
+              uri: ${IDENTITY_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/v1/auth/**, /api/v1/me
+
+            - id: identity-drivers
+              uri: ${IDENTITY_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/v1/drivers/**
+
+            - id: location-service
+              uri: ${LOCATION_SERVICE_URL:http://localhost:8082}
+              predicates:
+                - Path=/api/v1/locations/**
+
+            - id: pricing-service
+              uri: ${PRICING_SERVICE_URL:http://localhost:8083}
+              predicates:
+                - Path=/api/v1/admin/pricing-rules/**
+
+            - id: pricing-fares
+              uri: ${PRICING_SERVICE_URL:http://localhost:8083}
+              predicates:
+                - Path=/api/v1/fares/**
+
+            - id: trip-service
+              uri: ${TRIP_SERVICE_URL:http://localhost:8084}
+              predicates:
+                - Path=/api/v1/trips/**
+
+            - id: dispatch-offers
+              uri: ${DISPATCH_SERVICE_URL:http://localhost:8085}
+              predicates:
+                - Path=/api/v1/offers/**
+
+            - id: realtime-websocket
+              uri: ${REALTIME_SERVICE_WS_URL:ws://localhost:8086}
+              predicates:
+                - Path=/ws, /ws/**
+
+            - id: payment-service
+              uri: ${PAYMENT_SERVICE_URL:http://localhost:8087}
+              predicates:
+                - Path=/api/v1/payments/**
+
+            - id: wallet-finance
+              uri: ${WALLET_SERVICE_URL:http://localhost:8088}
+              predicates:
+                - Path=/api/v1/finance/wallets/**, /api/v1/finance/ledger/**
+
+            - id: wallet-service
+              uri: ${WALLET_SERVICE_URL:http://localhost:8088}
+              predicates:
+                - Path=/api/v1/wallets/**
+
+            - id: payment-finance
+              uri: ${PAYMENT_SERVICE_URL:http://localhost:8087}
+              predicates:
+                - Path=/api/v1/finance/**
+
+            - id: payment-admin
+              uri: ${PAYMENT_SERVICE_URL:http://localhost:8087}
+              predicates:
+                - Path=/api/v1/admin/payments/**

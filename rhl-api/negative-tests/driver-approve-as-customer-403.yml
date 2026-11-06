@@ -1,0 +1,29 @@
+info:
+  name: driver-approve-as-customer-403
+  type: http
+  seq: 3
+
+http:
+  method: PATCH
+  url: "{{baseUrl}}/api/v1/drivers/applications/00000000-0000-0000-0000-000000000000/approve"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 403 Forbidden", function() {
+          expect(res.status).to.equal(403);
+        });
+        test("Error code indicates access denied", function() {
+          expect(res.body).to.have.property("code");
+          expect(["ACCESS_DENIED", "FORBIDDEN"]).to.include(res.body.code);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

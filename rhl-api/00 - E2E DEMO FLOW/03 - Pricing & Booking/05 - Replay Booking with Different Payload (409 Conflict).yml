@@ -1,0 +1,38 @@
+info:
+  name: 05 - Replay Booking with Different Payload (409 Conflict)
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/trips"
+  body:
+    type: json
+    data: |-
+      {
+        "quoteId": "{{quoteId}}",
+        "idempotencyKey": "{{tripIdempotencyKey}}",
+        "serviceType": "RIDE",
+        "vehicleType": "CAR",
+        "customerConfirmedSurge": true
+      }
+  auth:
+    type: bearer
+    token: "{{customerAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 409 Conflict", function() {
+          expect(res.status).to.equal(409);
+        });
+        test("Returns IDEMPOTENCY_PAYLOAD_MISMATCH", function() {
+          expect(res.body.code).to.equal("IDEMPOTENCY_PAYLOAD_MISMATCH");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

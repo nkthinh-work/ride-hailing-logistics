@@ -1,0 +1,30 @@
+info:
+  name: 04 - Driver Complete Trip
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/trips/{{tripId}}/complete"
+  auth:
+    type: bearer
+    token: "{{driverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Trip status transitioned to COMPLETED", function() {
+          expect(res.body.tripId).to.equal(bru.getEnvVar("tripId"));
+          expect(res.body.status).to.equal("COMPLETED");
+          expect(res.body).to.have.property("completedAt");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

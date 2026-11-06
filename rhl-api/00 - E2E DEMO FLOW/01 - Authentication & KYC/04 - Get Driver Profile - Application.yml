@@ -1,0 +1,34 @@
+info:
+  name: 04 - Get Driver Profile - Application
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/v1/drivers/applications/me"
+  auth:
+    type: bearer
+    token: "{{driverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 200 && res.body && res.body.id) {
+          bru.setEnvVar("driverApplicationId", res.body.id);
+        }
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Driver profile application retrieved", function() {
+          expect(res.body).to.have.property("id");
+          expect(res.body).to.have.property("status");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

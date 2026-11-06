@@ -1,0 +1,53 @@
+info:
+  name: 01 - Get Fare Quote
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/fares/quote"
+  body:
+    type: json
+    data: |-
+      {
+        "serviceType": "RIDE",
+        "vehicleType": "MOTORBIKE",
+        "regionId": "DEFAULT",
+        "pickupLatitude": 21.0278,
+        "pickupLongitude": 105.8342,
+        "pickupAddress": "Hoan Kiem, Ha Noi",
+        "dropoffLatitude": 21.0340,
+        "dropoffLongitude": 105.8430,
+        "dropoffAddress": "Hai Ba Trung, Ha Noi"
+      }
+  auth:
+    type: bearer
+    token: "{{customerAccessToken}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 201 && res.body && res.body.quoteId) {
+          bru.setEnvVar("quoteId", res.body.quoteId);
+          // Generate fresh idempotency key for this trip booking
+          bru.setEnvVar("tripIdempotencyKey", "TRIP-DEMO-" + Date.now());
+        }
+    - type: tests
+      code: |-
+        test("Status code is 201 Created", function() {
+          expect(res.status).to.equal(201);
+        });
+        test("Returns valid quote with fare breakdown", function() {
+          expect(res.body).to.have.property("quoteId");
+          expect(res.body.serviceType).to.equal("RIDE");
+          expect(res.body.vehicleType).to.equal("MOTORBIKE");
+          expect(res.body).to.have.property("totalFare");
+          expect(res.body.isExpired).to.equal(false);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

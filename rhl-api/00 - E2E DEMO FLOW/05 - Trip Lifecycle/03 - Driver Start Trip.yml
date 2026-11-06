@@ -1,0 +1,29 @@
+info:
+  name: 03 - Driver Start Trip
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/trips/{{tripId}}/start"
+  auth:
+    type: bearer
+    token: "{{driverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Trip status transitioned to IN_TRIP", function() {
+          expect(res.body.tripId).to.equal(bru.getEnvVar("tripId"));
+          expect(res.body.status).to.equal("IN_TRIP");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,25 @@
+info:
+  name: 09 - Expired Offer Accept (409)
+  type: http
+  seq: 9
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/offers/00000000-0000-0000-0000-000000000000/accept"
+  auth:
+    type: bearer
+    token: "{{driverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 404 Not Found or 409 Expired", function() {
+          expect(res.status).to.be.oneOf([404, 409]);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

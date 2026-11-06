@@ -1,0 +1,40 @@
+info:
+  name: 07-customer-initiate-digital-repeat-idempotency
+  type: http
+  seq: 7
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/payments"
+  headers:
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: "idemp-digital-momo-001"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+  body:
+    type: json
+    data: |-
+      {
+        "tripId": "{{paymentTripId}}",
+        "paymentMethod": "DIGITAL_WALLET"
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK (idempotent replay)", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Returns exact same paymentId without double charge attempt", function() {
+          expect(res.body.paymentId).to.equal(bru.getEnvVar("paymentId"));
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

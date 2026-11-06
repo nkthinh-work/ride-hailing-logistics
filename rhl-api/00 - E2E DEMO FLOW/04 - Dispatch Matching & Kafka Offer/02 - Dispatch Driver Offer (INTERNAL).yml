@@ -1,0 +1,42 @@
+info:
+  name: 02 - Dispatch Driver Offer (INTERNAL)
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{dispatchBaseUrl}}/internal/v1/dispatch/matching/start"
+  headers:
+    - name: X-Internal-Secret
+      value: "{{internalSecret}}"
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "tripId": "{{tripId}}"
+      }
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 200 && res.body && res.body.offerId) {
+          bru.setEnvVar("offerId", res.body.offerId);
+        }
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Matching outcome indicates offer dispatched or matched", function() {
+          expect(res.body.tripId).to.equal(bru.getEnvVar("tripId"));
+          expect(res.body.outcome).to.be.oneOf(["OFFER_DISPATCHED", "ALREADY_MATCHED"]);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

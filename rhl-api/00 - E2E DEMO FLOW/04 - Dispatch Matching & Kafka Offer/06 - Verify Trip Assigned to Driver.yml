@@ -1,0 +1,30 @@
+info:
+  name: 06 - Verify Trip Assigned to Driver
+  type: http
+  seq: 6
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/v1/trips/{{tripId}}"
+  auth:
+    type: bearer
+    token: "{{customerAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Trip status is ACCEPTED with assigned driver", function() {
+          expect(res.body.tripId).to.equal(bru.getEnvVar("tripId"));
+          expect(res.body.status).to.equal("ACCEPTED");
+          expect(res.body.driverId).to.equal(bru.getEnvVar("driverUserId"));
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

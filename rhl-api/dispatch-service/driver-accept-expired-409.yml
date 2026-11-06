@@ -1,0 +1,29 @@
+info:
+  name: driver-accept-expired-409
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/offers/{{expiredOfferId}}/accept"
+  headers: []
+  auth:
+    type: bearer
+    token: "{{driverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 409 Conflict", function() {
+          expect(res.status).to.equal(409);
+        });
+        test("Error code is OFFER_EXPIRED", function() {
+          expect(res.body.code).to.equal("OFFER_EXPIRED");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

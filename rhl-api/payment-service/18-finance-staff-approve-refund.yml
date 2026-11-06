@@ -1,0 +1,30 @@
+info:
+  name: 18-finance-staff-approve-refund
+  type: http
+  seq: 18
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/finance/refunds/{{refundId}}/approve"
+  auth:
+    type: bearer
+    token: "{{financeAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Refund status transition recorded", function() {
+          expect(res.body.refundId).to.equal(bru.getEnvVar("refundId"));
+          expect(["APPROVED", "PROCESSING", "SUCCEEDED"]).to.include(res.body.status);
+          expect(res.body.approvedBy).to.not.be.empty;
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

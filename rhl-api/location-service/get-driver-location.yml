@@ -1,0 +1,29 @@
+info:
+  name: get-driver-location
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/v1/locations/me"
+  auth:
+    type: bearer
+    token: "{{driverToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Response contains driver location details", function() {
+          expect(res.body).to.have.property("driverId");
+          expect(res.body).to.have.property("status");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

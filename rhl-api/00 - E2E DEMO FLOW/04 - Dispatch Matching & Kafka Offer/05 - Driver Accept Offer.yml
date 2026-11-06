@@ -1,0 +1,29 @@
+info:
+  name: 05 - Driver Accept Offer
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/offers/{{offerId}}/accept"
+  auth:
+    type: bearer
+    token: "{{driverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Offer accepted and trip assigned", function() {
+          expect(res.body.offerId).to.equal(bru.getEnvVar("offerId"));
+          expect(res.body.status).to.equal("ACCEPTED");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,36 @@
+info:
+  name: driver-turn-online
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/locations/me/online"
+  body:
+    type: json
+    data: |-
+      {
+        "longitude": 105.8342,
+        "latitude": 21.0278
+      }
+  auth:
+    type: bearer
+    token: "{{driverToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Driver status is updated to ONLINE", function() {
+          expect(res.body).to.have.property("status");
+          expect(res.body.status).to.equal("ONLINE");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

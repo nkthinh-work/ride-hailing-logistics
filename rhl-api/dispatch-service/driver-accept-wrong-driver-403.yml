@@ -1,0 +1,29 @@
+info:
+  name: driver-accept-wrong-driver-403
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/offers/{{offerId}}/accept"
+  headers: []
+  auth:
+    type: bearer
+    token: "{{strangerDriverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 403 Forbidden", function() {
+          expect(res.status).to.equal(403);
+        });
+        test("Error code is OFFER_ACCESS_DENIED", function() {
+          expect(res.body.code).to.equal("OFFER_ACCESS_DENIED");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

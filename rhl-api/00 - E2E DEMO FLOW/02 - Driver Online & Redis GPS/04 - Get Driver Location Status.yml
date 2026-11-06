@@ -1,0 +1,29 @@
+info:
+  name: 04 - Get Driver Location Status
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/v1/locations/me"
+  auth:
+    type: bearer
+    token: "{{driverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Driver status is active ONLINE", function() {
+          expect(res.body.status).to.equal("ONLINE");
+          expect(res.body).to.have.property("sessionId");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

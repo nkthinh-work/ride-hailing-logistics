@@ -1,0 +1,45 @@
+info:
+  name: create-trip-success
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/trips"
+  headers:
+    - name: Content-Type
+      value: application/json
+  auth:
+    type: bearer
+    token: "{{customerAccessToken}}"
+  body:
+    type: json
+    data: |-
+      {
+        "quoteId": "{{quoteId}}",
+        "idempotencyKey": "{{tripIdempotencyKey}}",
+        "serviceType": "RIDE",
+        "vehicleType": "MOTORBIKE",
+        "customerConfirmedSurge": true
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 201 Created", function() {
+          expect(res.status).to.equal(201);
+        });
+        test("Returns created trip with CREATED status", function() {
+          expect(res.body).to.have.property("tripId");
+          expect(res.body.status).to.equal("CREATED");
+          expect(res.body.quoteId).to.equal(bru.getEnvVar("quoteId"));
+          expect(res.body).to.have.property("estimatedFare");
+          bru.setEnvVar("tripId", res.body.tripId);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

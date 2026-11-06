@@ -1,0 +1,44 @@
+server:
+  port: 8085
+  error:
+    include-stacktrace: never
+    include-exception: false
+    include-message: never
+
+spring:
+  application:
+    name: dispatch-service
+
+  datasource:
+    url: ${DISPATCH_DATABASE_URL:jdbc:postgresql://localhost:5436/rhl_dispatch}
+    username: ${DB_USER:rhl}
+    password: ${DB_PASSWORD:local}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+security:
+  jwt:
+    issuer: rhl-identity
+    public-key-location: classpath:keys/public.pem
+
+dispatch:
+  offer:
+    default-ttl-seconds: ${DISPATCH_OFFER_TTL_SECONDS:15}
+    max-retry-rounds: ${DISPATCH_MAX_RETRY_ROUNDS:3}
+  outbox:
+    enabled: ${DISPATCH_OUTBOX_ENABLED:true}
+    poll-interval-ms: ${DISPATCH_OUTBOX_POLL_INTERVAL_MS:1000}
+    transport: ${DISPATCH_OUTBOX_TRANSPORT:kafka}
+    lease-duration-ms: ${DISPATCH_OUTBOX_LEASE_DURATION_MS:30000}
+  kafka:
+    enabled: ${DISPATCH_KAFKA_ENABLED:true}
+    topic:
+      dispatch-offer: ${DISPATCH_KAFKA_TOPIC_OFFER:rhl.dispatch.offer.v1}

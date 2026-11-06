@@ -1,0 +1,28 @@
+info:
+  name: driver-start-pickup
+  type: http
+  seq: 11
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/trips/{{tripId}}/start-pickup"
+  auth:
+    type: bearer
+    token: "{{driverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Trip status is PICKING_UP", function() {
+          expect(res.body.status).to.equal("PICKING_UP");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

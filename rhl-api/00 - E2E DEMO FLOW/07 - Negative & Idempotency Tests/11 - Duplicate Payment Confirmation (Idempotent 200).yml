@@ -1,0 +1,28 @@
+info:
+  name: 11 - Duplicate Payment Confirmation (Idempotent 200)
+  type: http
+  seq: 11
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/payments/{{paymentId}}/cash/confirm"
+  auth:
+    type: bearer
+    token: "{{driverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK (idempotent cash confirmation)", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Returns confirmed status without duplicate execution", function() {
+          expect(res.body.paymentId).to.equal(bru.getEnvVar("paymentId"));
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

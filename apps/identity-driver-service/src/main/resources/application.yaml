@@ -1,0 +1,35 @@
+
+server:
+  port: 8081
+  error:
+    include-stacktrace: never
+    include-exception: false
+    include-message: never
+
+spring:
+  application:
+    name: identity-driver-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5436/rhl_identity
+    username: ${DB_USER:rhl}
+    password: ${DB_PASSWORD:local}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: false
+
+security:
+  jwt:
+    issuer: rhl-identity
+    private-key-location: ${JWT_PRIVATE_KEY_LOCATION:file:../../infra/keys/private.pem}
+    public-key-location: classpath:keys/public.pem
+  internal:
+    secret: ${INTERNAL_SERVICE_SECRET:rhl-internal-secret-2026}
+

@@ -1,0 +1,47 @@
+info:
+  name: 02 - Driver Go Online
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/locations/me/online"
+  body:
+    type: json
+    data: |-
+      {
+        "longitude": 105.8342,
+        "latitude": 21.0278
+      }
+  auth:
+    type: bearer
+    token: "{{driverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 200 && res.body) {
+          if (res.body.sessionId) {
+            bru.setEnvVar("driverSessionId", res.body.sessionId);
+          }
+          if (res.body.selectedVehicleId) {
+            bru.setEnvVar("vehicleId", res.body.selectedVehicleId);
+          }
+        }
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Driver status is updated to ONLINE", function() {
+          expect(res.body.status).to.equal("ONLINE");
+          expect(res.body).to.have.property("sessionId");
+          expect(res.body).to.have.property("selectedVehicleId");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

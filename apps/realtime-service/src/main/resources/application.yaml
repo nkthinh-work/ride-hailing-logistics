@@ -1,0 +1,35 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: realtime-service
+
+security:
+  jwt:
+    issuer: rhl-identity
+    public-key-location: classpath:keys/public.pem
+  internal:
+    secret: ${INTERNAL_SERVICE_SECRET:rhl-internal-secret-2026}
+
+realtime:
+  websocket:
+    endpoint: /ws
+    allowed-origin-patterns: "*"
+    heartbeat-outgoing-ms: 10000
+    heartbeat-incoming-ms: 10000
+  kafka:
+    enabled: ${REALTIME_KAFKA_ENABLED:true}
+    topic:
+      dispatch-offer: ${REALTIME_KAFKA_TOPIC_OFFER:rhl.dispatch.offer.v1}
+      trip-lifecycle: ${REALTIME_KAFKA_TOPIC_TRIP:rhl.trip.lifecycle.v1}
+    group:
+      dispatch: ${REALTIME_KAFKA_GROUP_DISPATCH:rhl.realtime.dispatch.v1}
+      trip: ${REALTIME_KAFKA_GROUP_TRIP:rhl.realtime.trip.v1}
+      dlt: ${REALTIME_KAFKA_GROUP_DLT:rhl.realtime.dlt.v1}
+
+logging:
+  level:
+    com.rhl.realtime: DEBUG
+    org.springframework.web.socket: INFO
+    org.springframework.messaging: INFO

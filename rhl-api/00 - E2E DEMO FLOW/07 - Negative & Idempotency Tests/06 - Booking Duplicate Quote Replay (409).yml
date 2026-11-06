@@ -1,0 +1,35 @@
+info:
+  name: 06 - Booking Duplicate Quote Replay (409)
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/trips"
+  body:
+    type: json
+    data: |-
+      {
+        "quoteId": "{{quoteId}}",
+        "idempotencyKey": "DIFFERENT-KEY-9999",
+        "serviceType": "RIDE",
+        "vehicleType": "MOTORBIKE",
+        "customerConfirmedSurge": true
+      }
+  auth:
+    type: bearer
+    token: "{{customerAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 409 Conflict", function() {
+          expect(res.status).to.equal(409);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

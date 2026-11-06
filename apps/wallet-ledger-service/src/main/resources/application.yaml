@@ -1,0 +1,50 @@
+server:
+  port: 8088
+  error:
+    include-stacktrace: never
+    include-exception: false
+    include-message: never
+
+spring:
+  application:
+    name: wallet-ledger-service
+
+  datasource:
+    url: ${WALLET_DATABASE_URL:jdbc:postgresql://localhost:5436/rhl_wallet_ledger}
+    username: ${DB_USER:rhl}
+    password: ${DB_PASSWORD:local}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+security:
+  jwt:
+    issuer: rhl-identity
+    public-key-location: classpath:keys/public.pem
+  internal:
+    secret: ${INTERNAL_SERVICE_SECRET:rhl-internal-secret-2026}
+
+wallet:
+  default-currency: VND
+  commission:
+    policy-status: COMMISSION_POLICY_PENDING
+  settlement:
+    policy-status: SETTLEMENT_POLICY_PENDING
+
+kafka:
+  enabled: ${KAFKA_ENABLED:true}
+  bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9094}
+  consumer:
+    group-id: ${KAFKA_CONSUMER_GROUP:rhl.wallet-ledger.v1}
+    auto-offset-reset: earliest
+    concurrency: 1
+  topics:
+    payment-events: ${KAFKA_PAYMENT_EVENTS_TOPIC:rhl.payment.events.v1}
+    payment-events-dlt: ${KAFKA_PAYMENT_EVENTS_DLT_TOPIC:rhl.payment.events.v1.dlt}

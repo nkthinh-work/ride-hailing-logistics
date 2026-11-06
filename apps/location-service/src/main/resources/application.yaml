@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: location-service
+
+  data:
+    redis:
+      host: localhost
+      port: 6380
+
+server:
+  port: 8082
+  error:
+    include-stacktrace: never
+    include-exception: false
+    include-message: never
+
+security:
+  jwt:
+    issuer: rhl-identity
+    public-key-location: classpath:keys/public.pem
+
+identity:
+  service:
+    base-url: ${IDENTITY_SERVICE_URL:http://localhost:8081}
+    internal-secret: ${INTERNAL_SERVICE_SECRET:rhl-internal-secret-2026}
+    connect-timeout-ms: ${IDENTITY_CONNECT_TIMEOUT_MS:2000}
+    read-timeout-ms: ${IDENTITY_READ_TIMEOUT_MS:3000}
+
+location:
+  telemetry:
+    max-stale-seconds: ${TELEMETRY_MAX_STALE_SECONDS:60}
+    max-future-skew-seconds: ${TELEMETRY_MAX_FUTURE_SKEW_SECONDS:15}
+    max-accuracy-meters: ${TELEMETRY_MAX_ACCURACY_METERS:100.0}
+    max-speed-kmh: ${TELEMETRY_MAX_SPEED_KMH:150.0}
+    min-jump-distance-meters: ${TELEMETRY_MIN_JUMP_METERS:200.0}

@@ -1,0 +1,46 @@
+info:
+  name: 10-momo-webhook-callback-success
+  type: http
+  seq: 10
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/payments/webhook/momo"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "partnerCode": "MOMO_TEST_PARTNER",
+        "orderId": "{{providerOrderId}}",
+        "requestId": "req-ipn-001",
+        "amount": 50000,
+        "orderInfo": "Payment for trip",
+        "orderType": "momo_wallet",
+        "transId": 987654321,
+        "resultCode": 0,
+        "message": "Successful.",
+        "payType": "qr",
+        "responseTime": 1680000000000,
+        "extraData": "",
+        "signature": "{{webhookSignature}}"
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Response acknowledges receipt", function() {
+          expect(res.body.status).to.equal("ACKNOWLEDGED");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

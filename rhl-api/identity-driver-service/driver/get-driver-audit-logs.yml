@@ -1,0 +1,39 @@
+info:
+  name: get-driver-audit-logs
+  type: http
+  seq: 11
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/v1/drivers/applications/{{applicationId}}/audit-logs"
+  auth:
+    type: bearer
+    token: "{{reviewerToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Response is an array of audit logs", function() {
+          expect(res.body).to.be.an("array");
+        });
+        test("Audit logs contain required tracking fields", function() {
+          if (res.body.length > 0) {
+            const firstLog = res.body[0];
+            expect(firstLog).to.have.property("id");
+            expect(firstLog).to.have.property("driverProfileId");
+            expect(firstLog).to.have.property("actorId");
+            expect(firstLog).to.have.property("action");
+            expect(firstLog).to.have.property("newStatus");
+            expect(firstLog).to.have.property("createdAt");
+          }
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

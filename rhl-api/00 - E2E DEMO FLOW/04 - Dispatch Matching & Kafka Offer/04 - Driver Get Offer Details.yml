@@ -1,0 +1,30 @@
+info:
+  name: 04 - Driver Get Offer Details
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/v1/offers/{{offerId}}"
+  auth:
+    type: bearer
+    token: "{{driverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Driver can inspect own offer details", function() {
+          expect(res.body.offerId).to.equal(bru.getEnvVar("offerId"));
+          expect(res.body.driverId).to.equal(bru.getEnvVar("driverUserId"));
+          expect(res.body).to.have.property("expiresAt");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

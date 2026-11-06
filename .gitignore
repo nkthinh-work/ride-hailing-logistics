@@ -1,0 +1,38 @@
+# Secrets
+/infra/keys/
+**/keys/private.pem
+.env
+.env.*
+!.env.example
+
+# Gradle
+**/.gradle/
+**/build/
+
+# IntelliJ
+**/.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# Java
+**/bin/
+**/out/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs & Crash Dumps
+*.log
+hs_err_pid*
+
+# Node / Frontend
+**/node_modules/
+**/dist/
+.vite/
+
+# AI Agent Internal Memory & Rules (Safety Separation)
+/project-internal/
+/AGENTS.md

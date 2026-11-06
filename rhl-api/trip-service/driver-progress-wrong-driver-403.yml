@@ -1,0 +1,28 @@
+info:
+  name: driver-progress-wrong-driver-403
+  type: http
+  seq: 15
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/trips/{{tripId}}/start-pickup"
+  auth:
+    type: bearer
+    token: "{{unauthorizedDriverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 403 Forbidden", function() {
+          expect(res.status).to.equal(403);
+        });
+        test("Error code is TRIP_ACCESS_DENIED", function() {
+          expect(res.body.code).to.equal("TRIP_ACCESS_DENIED");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,42 @@
+info:
+  name: fare-quote-invalid-coords-400
+  type: http
+  seq: 18
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/fares/quote"
+  headers:
+    - name: Content-Type
+      value: application/json
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+  body:
+    type: json
+    data: |-
+      {
+        "serviceType": "RIDE",
+        "vehicleType": "MOTORBIKE",
+        "pickupLatitude": 95.0,
+        "pickupLongitude": 106.7009,
+        "dropoffLatitude": 10.7725,
+        "dropoffLongitude": 106.6980
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 400 Bad Request", function() {
+          expect(res.status).to.equal(400);
+        });
+        test("Returns VALIDATION_ERROR code", function() {
+          expect(res.body.code).to.equal("VALIDATION_ERROR");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

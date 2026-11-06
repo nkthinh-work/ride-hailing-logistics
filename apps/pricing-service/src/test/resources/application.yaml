@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:rhl_pricing;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  flyway:
+    enabled: false
+
+security:
+  jwt:
+    issuer: rhl-identity
+    public-key-location: classpath:keys/public.pem
+
+rhl:
+  pricing:
+    dev-fallback-enabled: true
+    default-currency: VND
+    default-rule-version: "DEV-v1.0"
+    policies:
+      MOTORBIKE:
+        base-fare: 12000
+        included-distance-km: 2.0
+        price-per-km: 4500
+        price-per-minute: 400
+        minimum-fare: 12000
+      CAR_4_SEAT:
+        base-fare: 20000
+        included-distance-km: 2.0
+        price-per-km: 11000
+        price-per-minute: 800
+        minimum-fare: 20000
+      CAR_7_SEAT:
+        base-fare: 25000
+        included-distance-km: 2.0
+        price-per-km: 13000
+        price-per-minute: 1000
+        minimum-fare: 25000

@@ -1,0 +1,38 @@
+info:
+  name: driver-reject-offer
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/offers/{{offerId}}/reject"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "reason": "DRIVER_BUSY"
+      }
+  auth:
+    type: bearer
+    token: "{{driverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Offer status is REJECTED", function() {
+          expect(res.body.id).to.equal(bru.getEnvVar("offerId"));
+          expect(res.body.status).to.equal("REJECTED");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

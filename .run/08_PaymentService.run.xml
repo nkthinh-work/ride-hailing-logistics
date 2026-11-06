@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="08_PaymentService" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.rhl.payment.PaymentServiceApplication" />
+    <module name="payment-service.main" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/apps/payment-service" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

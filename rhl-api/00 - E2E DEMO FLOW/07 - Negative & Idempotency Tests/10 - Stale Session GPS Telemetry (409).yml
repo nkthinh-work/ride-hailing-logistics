@@ -1,0 +1,37 @@
+info:
+  name: 10 - Stale Session GPS Telemetry (409)
+  type: http
+  seq: 10
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/api/v1/locations/me"
+  body:
+    type: json
+    data: |-
+      {
+        "longitude": 105.8345,
+        "latitude": 21.0280,
+        "sequence": 99,
+        "sessionId": "00000000-0000-0000-0000-000000000000"
+      }
+  auth:
+    type: bearer
+    token: "{{driverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 409 Conflict", function() {
+          expect(res.status).to.equal(409);
+        });
+        test("Returns STALE_SESSION_PACKET", function() {
+          expect(res.body.code).to.equal("STALE_SESSION_PACKET");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

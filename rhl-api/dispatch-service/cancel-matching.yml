@@ -1,0 +1,38 @@
+info:
+  name: cancel-matching
+  type: http
+  seq: 9
+
+http:
+  method: POST
+  url: "{{baseUrl}}/internal/v1/dispatch/matching/cancel"
+  headers:
+    - name: X-Internal-Secret
+      value: "{{internalSecret}}"
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "tripId": "{{tripId}}",
+        "reason": "Customer cancelled trip during dispatch"
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Outcome is CANCELLED", function() {
+          expect(res.body.tripId).to.equal(bru.getEnvVar("tripId"));
+          expect(res.body.outcome).to.equal("CANCELLED");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

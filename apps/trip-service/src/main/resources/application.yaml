@@ -1,0 +1,48 @@
+server:
+  port: 8084
+  error:
+    include-stacktrace: never
+    include-exception: false
+    include-message: never
+
+spring:
+  application:
+    name: trip-service
+
+  datasource:
+    url: ${TRIP_DATABASE_URL:jdbc:postgresql://localhost:5436/rhl_trip}
+    username: ${DB_USER:rhl}
+    password: ${DB_PASSWORD:local}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+security:
+  jwt:
+    issuer: rhl-identity
+    public-key-location: classpath:keys/public.pem
+
+pricing:
+  service:
+    base-url: ${PRICING_SERVICE_BASE_URL:http://localhost:8083}
+    internal-secret: ${PRICING_INTERNAL_SECRET:rhl-pricing-internal-secret-2026}
+    connect-timeout-ms: ${PRICING_CONNECT_TIMEOUT_MS:2000}
+    read-timeout-ms: ${PRICING_READ_TIMEOUT_MS:3000}
+
+trip:
+  outbox:
+    enabled: ${TRIP_OUTBOX_ENABLED:true}
+    poll-interval-ms: ${TRIP_OUTBOX_POLL_INTERVAL_MS:1000}
+    transport: ${TRIP_OUTBOX_TRANSPORT:kafka}
+    lease-duration-ms: ${TRIP_OUTBOX_LEASE_DURATION_MS:30000}
+  kafka:
+    enabled: ${TRIP_KAFKA_ENABLED:true}
+    topic:
+      trip-lifecycle: ${TRIP_KAFKA_TOPIC_LIFECYCLE:rhl.trip.lifecycle.v1}

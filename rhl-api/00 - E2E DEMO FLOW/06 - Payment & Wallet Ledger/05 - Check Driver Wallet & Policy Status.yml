@@ -1,0 +1,31 @@
+info:
+  name: 05 - Check Driver Wallet & Policy Status
+  type: http
+  seq: 5
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/v1/wallets/me"
+  auth:
+    type: bearer
+    token: "{{driverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Driver wallet loaded with balance and policy status indicator", function() {
+          expect(res.body).to.have.property("walletId");
+          expect(res.body.driverId).to.equal(bru.getEnvVar("driverUserId"));
+          expect(res.body).to.have.property("currency");
+          expect(res.body).to.have.property("policyStatus");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

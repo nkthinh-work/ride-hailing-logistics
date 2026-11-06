@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="04_PricingService" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.rhl.pricing.PricingServiceApplication" />
+    <module name="pricing-service.main" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/apps/pricing-service" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

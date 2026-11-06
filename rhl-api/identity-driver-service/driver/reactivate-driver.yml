@@ -1,0 +1,29 @@
+info:
+  name: reactivate-driver
+  type: http
+  seq: 10
+
+http:
+  method: PATCH
+  url: "{{baseUrl}}/api/v1/drivers/applications/{{applicationId}}/reactivate"
+  auth:
+    type: bearer
+    token: "{{adminToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Application status is restored to APPROVED", function() {
+          expect(res.body).to.have.property("status");
+          expect(res.body.status).to.equal("APPROVED");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

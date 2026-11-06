@@ -1,0 +1,37 @@
+info:
+  name: 17-driver-cannot-request-refund-403
+  type: http
+  seq: 17
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/payments/{{paymentId}}/refunds"
+  headers:
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: "idemp-driver-unauthorized-001"
+  auth:
+    type: bearer
+    token: "{{driverAccessToken}}"
+  body:
+    type: json
+    data: |-
+      {
+        "amount": 10000,
+        "reason": "Driver attempting to create refund directly"
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 403 Forbidden", function() {
+          expect(res.status).to.equal(403);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

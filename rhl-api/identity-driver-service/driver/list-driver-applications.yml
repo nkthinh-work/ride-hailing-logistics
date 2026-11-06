@@ -1,0 +1,28 @@
+info:
+  name: list-driver-applications
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/v1/drivers/applications?status=PENDING"
+  auth:
+    type: bearer
+    token: "{{reviewerToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Response is an array of applications", function() {
+          expect(res.body).to.be.an("array");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

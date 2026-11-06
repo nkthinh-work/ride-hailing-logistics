@@ -1,0 +1,30 @@
+info:
+  name: 20-admin-run-payment-reconciliation
+  type: http
+  seq: 20
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/admin/payments/reconciliation/run"
+  auth:
+    type: bearer
+    token: "{{adminAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Reconciliation execution summary returned", function() {
+          expect(res.body.status).to.equal("COMPLETED");
+          expect(res.body).to.have.property("reconciledAttemptsCount");
+          expect(res.body).to.have.property("mismatchesFoundCount");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

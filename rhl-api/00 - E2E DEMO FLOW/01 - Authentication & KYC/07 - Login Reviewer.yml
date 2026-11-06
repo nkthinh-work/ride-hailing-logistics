@@ -1,0 +1,38 @@
+info:
+  name: 07 - Login Reviewer
+  type: http
+  seq: 7
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/auth/login"
+  body:
+    type: json
+    data: |-
+      {
+        "email": "reviewer.demo@example.com",
+        "password": "Review12345!"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 200 && res.body && res.body.accessToken) {
+          bru.setEnvVar("reviewerAccessToken", res.body.accessToken);
+        }
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Reviewer token received", function() {
+          expect(res.body).to.have.property("accessToken");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

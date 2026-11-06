@@ -1,0 +1,49 @@
+info:
+  name: register-vehicle
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/drivers/vehicles"
+  body:
+    type: json
+    data: |-
+      {
+        "type": "CAR_4_SEAT",
+        "plate": "{{vehiclePlate}}",
+        "make": "Toyota",
+        "model": "Vios",
+        "color": "White"
+      }
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+runtime:
+  scripts:
+    - type: before-request
+      code: |-
+        const ts = Date.now().toString().slice(-5);
+        bru.setEnvVar("vehiclePlate", "29A-" + ts);
+    - type: after-response
+      code: |-
+        if (res.status === 201 && res.body && res.body.id) {
+          bru.setEnvVar("vehicleId", res.body.id);
+        }
+    - type: tests
+      code: |-
+        test("Status code is 201 Created", function() {
+          expect(res.status).to.equal(201);
+        });
+        test("Response contains vehicle id, plate, and ACTIVE or INACTIVE status", function() {
+          expect(res.body).to.have.property("id");
+          expect(res.body).to.have.property("plate");
+          expect(res.body.type).to.equal("CAR_4_SEAT");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

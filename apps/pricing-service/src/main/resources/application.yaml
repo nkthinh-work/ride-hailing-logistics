@@ -1,0 +1,73 @@
+server:
+  port: 8083
+  error:
+    include-stacktrace: never
+    include-exception: false
+    include-message: never
+
+spring:
+  application:
+    name: pricing-service
+
+  datasource:
+    url: ${PRICING_DATABASE_URL:jdbc:postgresql://localhost:5436/rhl_pricing}
+    username: ${DB_USER:rhl}
+    password: ${DB_PASSWORD:local}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+security:
+  internal:
+    secret: ${PRICING_INTERNAL_SECRET:rhl-pricing-internal-secret-2026}
+  jwt:
+    issuer: rhl-identity
+    public-key-location: classpath:keys/public.pem
+
+rhl:
+  pricing:
+    # Fail-closed in production: dev-fallback-enabled is false by default
+    dev-fallback-enabled: ${PRICING_DEV_FALLBACK_ENABLED:false}
+    # Fare Quote Configuration (FR-PRI-013..015)
+    quote:
+      ttl-seconds: ${PRICING_QUOTE_TTL_SECONDS:300}
+      allow-simulated-routing: ${PRICING_ALLOW_SIMULATED_ROUTING:true}
+    # Dynamic Surge Configuration (FR-PRI-007..010) - PROVISIONAL_DEV_CONFIG
+    surge:
+      enabled: ${PRICING_SURGE_ENABLED:false}
+      allow-simulated-surge: ${PRICING_ALLOW_SIMULATED_SURGE:true}
+      policy-version: ${PRICING_SURGE_POLICY_VERSION:SURGE-DEV-v1.0}
+      min-multiplier: 1.00
+      max-multiplier: 2.50
+      threshold-ratio: 1.00
+      sensitivity: 0.50
+      time-window-minutes: 15
+    # PROVISIONAL_DEV_CONFIG: Biểu giá tham chiếu phát triển và kiểm thử, KHÔNG PHẢI bảng giá kinh doanh chính thức.
+    default-currency: VND
+    default-rule-version: "DEV-v1.0"
+    policies:
+      MOTORBIKE:
+        base-fare: 12000
+        included-distance-km: 2.0
+        price-per-km: 4500
+        price-per-minute: 400
+        minimum-fare: 12000
+      CAR_4_SEAT:
+        base-fare: 20000
+        included-distance-km: 2.0
+        price-per-km: 11000
+        price-per-minute: 800
+        minimum-fare: 20000
+      CAR_7_SEAT:
+        base-fare: 25000
+        included-distance-km: 2.0
+        price-per-km: 13000
+        price-per-minute: 1000
+        minimum-fare: 25000

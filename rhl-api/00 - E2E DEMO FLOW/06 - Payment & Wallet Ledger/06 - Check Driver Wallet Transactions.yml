@@ -1,0 +1,28 @@
+info:
+  name: 06 - Check Driver Wallet Transactions
+  type: http
+  seq: 6
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/v1/wallets/me/transactions"
+  auth:
+    type: bearer
+    token: "{{driverAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Driver transactions list returned", function() {
+          expect(res.body).to.be.an("array");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

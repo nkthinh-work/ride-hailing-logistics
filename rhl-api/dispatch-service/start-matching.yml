@@ -1,0 +1,37 @@
+info:
+  name: start-matching
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/internal/v1/dispatch/matching/start"
+  headers:
+    - name: X-Internal-Secret
+      value: "{{internalSecret}}"
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "tripId": "{{tripId}}"
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Matching orchestrator returns offer dispatched or session status", function() {
+          expect(res.body.tripId).to.equal(bru.getEnvVar("tripId"));
+          expect(res.body.outcome).to.be.oneOf(["OFFER_DISPATCHED", "ALREADY_MATCHED", "NO_DRIVER"]);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

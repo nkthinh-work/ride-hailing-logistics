@@ -1,0 +1,61 @@
+info:
+  name: reject-driver-application
+  type: http
+  seq: 5
+
+http:
+  method: PATCH
+  url: "{{baseUrl}}/api/v1/drivers/applications/{{rejectApplicationId}}/reject"
+  body:
+    type: json
+    data: |-
+      {
+        "reason": "Invalid vehicle registration document"
+      }
+  auth:
+    type: bearer
+    token: "{{reviewerToken}}"
+
+runtime:
+  scripts:
+    - type: before-request
+      code: |-
+        const ts = Date.now();
+        const email = `reject.candidate.${ts}@example.com`;
+        const pwd = "Password123!";
+        const base = bru.getEnvVar("baseUrl") || "http://localhost:8080";
+        try {
+          await axios.post(`${base}/api/v1/auth/register`, { email: email, password: pwd });
+          const loginRes = await axios.post(`${base}/api/v1/auth/login`, { email: email, password: pwd });
+          const candidateToken = loginRes.data.accessToken;
+          const licTs = ts.toString().slice(-8);
+          const appRes = await axios.post(`${base}/api/v1/drivers/applications`, {
+            fullName: "Candidate For Reject",
+            phone: "0998877665",
+            driverLicenseNumber: "REJ" + licTs,
+            vehiclePlate: "29B-" + licTs.slice(-5)
+          }, {
+            headers: { Authorization: `Bearer ${candidateToken}` }
+          });
+          if (appRes.data && appRes.data.id) {
+            bru.setEnvVar("rejectApplicationId", appRes.data.id);
+          }
+        } catch (e) {
+          // fallback if needed
+        }
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Application status is updated to REJECTED", function() {
+          expect(res.body).to.have.property("status");
+          expect(res.body.status).to.equal("REJECTED");
+          expect(res.body.rejectionReason).to.equal("Invalid vehicle registration document");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

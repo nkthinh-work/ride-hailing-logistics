@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:rhl_trip;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  flyway:
+    enabled: false
+
+security:
+  jwt:
+    issuer: rhl-identity
+    public-key-location: classpath:keys/public.pem
+
+trip:
+  outbox:
+    enabled: false
+  kafka:
+    enabled: false

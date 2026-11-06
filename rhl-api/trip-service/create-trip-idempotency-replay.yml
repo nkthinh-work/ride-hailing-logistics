@@ -1,0 +1,41 @@
+info:
+  name: create-trip-idempotency-replay
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/trips"
+  headers:
+    - name: Content-Type
+      value: application/json
+  auth:
+    type: bearer
+    token: "{{customerAccessToken}}"
+  body:
+    type: json
+    data: |-
+      {
+        "quoteId": "{{quoteId}}",
+        "idempotencyKey": "{{tripIdempotencyKey}}",
+        "serviceType": "RIDE",
+        "vehicleType": "MOTORBIKE",
+        "customerConfirmedSurge": true
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 201 Created on idempotent replay", function() {
+          expect(res.status).to.equal(201);
+        });
+        test("Returns same tripId on replay", function() {
+          expect(res.body.tripId).to.equal(bru.getEnvVar("tripId"));
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

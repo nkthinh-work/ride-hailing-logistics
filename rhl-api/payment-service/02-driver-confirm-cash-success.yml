@@ -1,0 +1,29 @@
+info:
+  name: 02-driver-confirm-cash-success
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/payments/{{paymentId}}/cash/confirm"
+  auth:
+    type: bearer
+    token: "{{driverToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 200 OK", function() {
+          expect(res.status).to.equal(200);
+        });
+        test("Payment status transitioned to SUCCEEDED", function() {
+          expect(res.body.paymentId).to.equal(bru.getEnvVar("paymentId"));
+          expect(res.body.status).to.equal("SUCCEEDED");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

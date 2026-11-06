@@ -1,0 +1,38 @@
+info:
+  name: 04 - Replay Booking with Same Idempotency Key
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/trips"
+  body:
+    type: json
+    data: |-
+      {
+        "quoteId": "{{quoteId}}",
+        "idempotencyKey": "{{tripIdempotencyKey}}",
+        "serviceType": "RIDE",
+        "vehicleType": "MOTORBIKE",
+        "customerConfirmedSurge": true
+      }
+  auth:
+    type: bearer
+    token: "{{customerAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status code is 201 Created (idempotent replay)", function() {
+          expect(res.status).to.equal(201);
+        });
+        test("Returns identical existing tripId without creating duplicate trip", function() {
+          expect(res.body.tripId).to.equal(bru.getEnvVar("tripId"));
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

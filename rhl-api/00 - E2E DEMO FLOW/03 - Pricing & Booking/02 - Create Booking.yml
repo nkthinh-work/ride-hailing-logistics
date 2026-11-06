@@ -1,0 +1,46 @@
+info:
+  name: 02 - Create Booking
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/trips"
+  body:
+    type: json
+    data: |-
+      {
+        "quoteId": "{{quoteId}}",
+        "idempotencyKey": "{{tripIdempotencyKey}}",
+        "serviceType": "RIDE",
+        "vehicleType": "MOTORBIKE",
+        "customerConfirmedSurge": true
+      }
+  auth:
+    type: bearer
+    token: "{{customerAccessToken}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 201 && res.body && res.body.tripId) {
+          bru.setEnvVar("tripId", res.body.tripId);
+          bru.setEnvVar("paymentTripId", res.body.tripId);
+        }
+    - type: tests
+      code: |-
+        test("Status code is 201 Created", function() {
+          expect(res.status).to.equal(201);
+        });
+        test("Trip created with CREATED status", function() {
+          expect(res.body).to.have.property("tripId");
+          expect(res.body.status).to.equal("CREATED");
+          expect(res.body.quoteId).to.equal(bru.getEnvVar("quoteId"));
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
